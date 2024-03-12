@@ -36,6 +36,10 @@ export async function launchRegistry() {
       res.status(409).send(`Node ${nodeId} is already registered.`);
     }
   });
+  
+  _registry.get("/getNodeRegistry", (req, res) => {
+    res.json({ nodes: nodeRegistry });
+  });
 
   const server = _registry.listen(REGISTRY_PORT, () => {
     console.log(`Registry is listening on port ${REGISTRY_PORT}`);
