@@ -9,18 +9,32 @@ export type RegisterNodeBody = {
   pubKey: string;
 };
 
-export type GetNodeRegistryBody = {
-  nodes: Node[];
-};
+// Initialize an in-memory store for registered nodes
+let nodeRegistry: Node[] = [];
 
 export async function launchRegistry() {
   const _registry = express();
   _registry.use(express.json());
   _registry.use(bodyParser.json());
 
-  // Implement the status route
   _registry.get("/status", (req, res) => {
     res.send('live');
+  });
+
+  // Route to register a node
+  _registry.post("/registerNode", (req: express.Request, res: express.Response) => {
+    const { nodeId, pubKey }: RegisterNodeBody = req.body;
+
+    // Check if the node is already registered
+    const isAlreadyRegistered = nodeRegistry.some(node => node.nodeId === nodeId);
+    if (!isAlreadyRegistered) {
+      nodeRegistry.push({ nodeId, pubKey });
+      console.log(`Node ${nodeId} registered with public key: ${pubKey}`);
+      res.status(200).send(`Node ${nodeId} registered successfully.`);
+    } else {
+      console.log(`Node ${nodeId} is already registered.`);
+      res.status(409).send(`Node ${nodeId} is already registered.`);
+    }
   });
 
   const server = _registry.listen(REGISTRY_PORT, () => {
