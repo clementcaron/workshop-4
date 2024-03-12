@@ -25,6 +25,14 @@ export async function user(userId: number) {
     res.json({ result: lastSentMessage });
   });
 
+  // POST route to receive a message
+  _user.post("/message", (req, res) => {
+    const { message }: { message: string } = req.body; // Extract message from request body
+    lastReceivedMessage = message; // Update last received message
+    console.log(`User ${userId} received message: ${message}`);
+    res.status(200).json({ message: "Message received successfully" });
+  });
+
   const server = _user.listen(BASE_USER_PORT + userId, () => {
     console.log(`User ${userId} is listening on port ${BASE_USER_PORT + userId}`);
   });
